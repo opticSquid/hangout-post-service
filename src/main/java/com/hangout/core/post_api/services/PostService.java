@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hangout.core.post_api.dto.FileUploadEvent;
 import com.hangout.core.post_api.dto.PostCreationResponse;
 import com.hangout.core.post_api.dto.UploadedMediaDetails;
 import com.hangout.core.post_api.dto.User;
@@ -54,14 +55,15 @@ public class PostService {
         // handled in global exception handler
         User user = authorizeUser(authToken);
         // create the post object
-        Post post = new Post(user.username(), postDescription.isPresent() ? postDescription.get() : "");
+        Post post = new Post(user.userId(), postDescription.isPresent() ? postDescription.get() : "");
         // upload files to shared path and get their file names
         List<UploadedMediaDetails> uploadedMediaFiles = uploadMedias(user, files);
         List<Media> postMedias = uploadedMediaFiles.parallelStream()
                 .map(file -> {
                     // produce events in kafka for successful file uploads
                     // this events will be consumed by storage service
-                    kafkaTemplate.send(topic, file.contentType(), file.derivedFilename());
+                    kafkaTemplate.send(topic, file.contentType(),
+                            new FileUploadEvent(file.derivedFilename(), user.userId()));
                     // create a list of media files to be added to db
                     return new Media(file.derivedFilename(), file.contentType(), post);
                 })
