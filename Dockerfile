@@ -11,6 +11,6 @@ RUN mvn clean package -DskipTests=true
 FROM amazoncorretto:21-alpine
 
 WORKDIR /app
-COPY --from=builder /usr/src/app/target/hangout-post-api-1.0.6.jar .
+COPY --from=builder /usr/src/app/target/hangout-post-api-1.0.7.jar .
 
-CMD ["java", "-jar", "hangout-post-api-1.0.6.jar"]
+CMD ["java", "-jar", "hangout-post-api-1.0.7.jar"]
