@@ -1,5 +1,6 @@
 package com.hangout.core.post_api.entities;
 
+import java.math.BigInteger;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID postId;
-    private String ownerName;
+    private BigInteger ownerId;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Media> postMedias;
     @Column(length = 500)
@@ -41,8 +42,8 @@ public class Post {
     @JsonProperty(access = Access.READ_ONLY)
     private final Boolean publish = true;
 
-    public Post(String ownerName, String postDescription) {
-        this.ownerName = ownerName;
+    public Post(BigInteger ownerId, String postDescription) {
+        this.ownerId = ownerId;
         this.postDescription = postDescription;
     }
 }
