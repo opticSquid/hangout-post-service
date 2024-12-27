@@ -1,5 +1,7 @@
 package com.hangout.core.post_api.dto;
 
-public record PostCreationResponse(Integer numberOfFilesUploaded, String postId) {
+import java.util.UUID;
+
+public record PostCreationResponse(UUID postId) {
 
 }
