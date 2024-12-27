@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.hangout.core.post_api.exceptions.FileUploadFailed;
 import com.hangout.core.post_api.exceptions.UnauthorizedAccessException;
 import com.hangout.core.post_api.exceptions.UnsupportedMediaType;
 
@@ -24,4 +25,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		problem.setTitle("Unsupported Media Type");
 		return problem;
 	}
+
+	@ExceptionHandler(FileUploadFailed.class)
+	public ProblemDetail exceptionHandler(FileUploadFailed ex) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+		problem.setTitle("File Upload Failed due to technical Errors. Please try after some time");
+		return problem;
+	}
+
 }

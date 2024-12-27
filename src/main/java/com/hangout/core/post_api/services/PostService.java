@@ -107,21 +107,25 @@ public class PostService {
         files.parallelStream().forEach(file -> {
             // check file content
             if (file.getContentType().startsWith("image/") || file.getContentType().startsWith("video/")) {
-                // create a hash for the file names of each file
-                String hashedFilename = hashService.hash(user);
-                // get the originalFilename split in the '.' position and get the extension name
-                int lastDotIndex = file.getOriginalFilename().lastIndexOf('.');
-                String originalfileExtension = file.getOriginalFilename().substring(lastDotIndex + 1);
-                hashedFilename += "." + originalfileExtension;
-                // save the multipart file to the given destination on disk
                 try {
-                    file.transferTo(new File(storageServicePath + "/" + hashedFilename));
-                } catch (IllegalStateException | IOException e) {
-                    throw new FileUploadFailed("Failed to upload file: " +
-                            file.getOriginalFilename());
+                    // create a hash for the file names of each file
+                    String hashedFilename = hashService.checksum(file);
+                    // get the originalFilename split in the '.' position and get the extension name
+                    int lastDotIndex = file.getOriginalFilename().lastIndexOf('.');
+                    String originalfileExtension = file.getOriginalFilename().substring(lastDotIndex + 1);
+                    hashedFilename += "." + originalfileExtension;
+                    // save the multipart file to the given destination on disk
+                    try {
+                        file.transferTo(new File(storageServicePath + "/" + hashedFilename));
+                    } catch (IllegalStateException | IOException e) {
+                        throw new FileUploadFailed("Failed to upload file: " +
+                                file.getOriginalFilename());
+                    }
+                    // add the file details to list
+                    details.add(new UploadedMediaDetails(hashedFilename, file.getContentType()));
+                } catch (IOException ex) {
+                    new UnsupportedMediaType("could not verify the contents of the file");
                 }
-                // add the file details to list
-                details.add(new UploadedMediaDetails(hashedFilename, file.getContentType()));
             } else {
                 throw new UnsupportedMediaType(file.getOriginalFilename()
                         + " is not supported. Please upload a supported format of multimedia file");
