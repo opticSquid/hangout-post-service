@@ -26,7 +26,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
-import io.opentelemetry.semconv.ResourceAttributes;
+import io.opentelemetry.semconv.ServiceAttributes;
 
 @Configuration
 public class OpenTelemetryConfig {
@@ -51,7 +51,7 @@ public class OpenTelemetryConfig {
                 String applicationName = environment.getProperty("spring.application.name",
                                 "application");
                 Resource springResource = Resource
-                                .create(Attributes.of(ResourceAttributes.SERVICE_NAME, applicationName));
+                                .create(Attributes.of(ServiceAttributes.SERVICE_NAME, applicationName));
                 SdkLoggerProviderBuilder builder = SdkLoggerProvider.builder()
                                 .setResource(Resource.getDefault().merge(springResource));
                 logRecordProcessors.orderedStream().forEach(builder::addLogRecordProcessor);
