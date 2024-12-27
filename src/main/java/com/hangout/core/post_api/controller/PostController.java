@@ -3,6 +3,7 @@ package com.hangout.core.post_api.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,9 @@ public class PostController {
     @PostMapping(path = "/full", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostCreationResponse> createPostWithMediasAndText(
             @RequestHeader(name = "Authorization") String authToken,
-            @RequestPart(value = "files") List<MultipartFile> files,
-            @RequestPart(value = "postDescription") String postDescription) {
-        return new ResponseEntity<>(postService.create(authToken, files, Optional.of(postDescription)),
+            @RequestPart(value = "file") MultipartFile file,
+            @RequestPart(value = "postDescription") String postDescription) throws FileUploadException {
+        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.of(postDescription)),
                 HttpStatus.CREATED);
     }
 
@@ -43,19 +44,19 @@ public class PostController {
     @PostMapping(path = "/short", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostCreationResponse> createPostWithMedias(
             @RequestHeader(name = "Authorization") String authToken,
-            @RequestPart(value = "files") List<MultipartFile> files) {
-        return new ResponseEntity<>(postService.create(authToken, files, Optional.empty()), HttpStatus.CREATED);
+            @RequestPart(value = "file") MultipartFile file) throws FileUploadException {
+        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.empty()), HttpStatus.CREATED);
     }
 
     @Observed(name = "get-all-posts", contextualName = "controller")
     @GetMapping("/all")
     public List<Post> getAllPosts() {
-        return postService.findAll();
+        return this.postService.findAll();
     }
 
     @Observed(name = "get-particular-post", contextualName = "controller")
     @GetMapping("/{postId}")
     public Post getAParticularPost(@PathVariable String postId) {
-        return postService.getParticularPost(postId);
+        return this.postService.getParticularPost(postId);
     }
 }

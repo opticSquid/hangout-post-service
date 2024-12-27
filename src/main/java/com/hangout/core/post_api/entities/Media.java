@@ -1,11 +1,14 @@
 package com.hangout.core.post_api.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,16 +18,25 @@ import lombok.NoArgsConstructor;
 public class Media {
     @Id
     @Column(length = 513)
-    private String hashedFilename;
+    private String filename;
     private String contentType;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @OneToMany(mappedBy = "media")
+    private List<Post> posts;
+    @Enumerated(value = EnumType.STRING)
+    private ProcessStatus processStatus;
 
-    public Media(String hashedFilename, String contentType, Post post) {
-        this.hashedFilename = hashedFilename;
+    public Media(String hashedFilename, String contentType) {
+        this.filename = hashedFilename;
         this.contentType = contentType;
-        this.post = post;
+        this.posts = new ArrayList<>();
+        this.processStatus = ProcessStatus.IN_QUEUE;
     }
 
+    public void addPost(Post post) {
+        if (this.posts.isEmpty()) {
+            this.processStatus = ProcessStatus.IN_QUEUE;
+            this.posts = new ArrayList<>();
+        }
+        this.posts.add(post);
+    }
 }

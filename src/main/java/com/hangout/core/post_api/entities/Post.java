@@ -3,19 +3,18 @@ package com.hangout.core.post_api.entities;
 import java.math.BigInteger;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,8 +28,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID postId;
     private BigInteger ownerId;
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Media> postMedias;
+    @ManyToOne
+    @JoinColumn(name = "filename")
+    private Media media;
     @Column(length = 500)
     private String postDescription;
     @JsonProperty(access = Access.READ_ONLY)
@@ -44,8 +44,14 @@ public class Post {
     @JsonProperty(access = Access.READ_ONLY)
     private final Boolean publish = true;
 
-    public Post(BigInteger ownerId, String postDescription) {
+    public Post(BigInteger ownerId, String postDescription, Media media) {
         this.ownerId = ownerId;
         this.postDescription = postDescription;
+        this.media = media;
+    }
+
+    public Post(BigInteger ownerId, Media media) {
+        this.ownerId = ownerId;
+        this.media = media;
     }
 }
