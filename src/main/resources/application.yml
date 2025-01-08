@@ -76,7 +76,7 @@ hangout:
   auth-service:
     url: ${AUTH_SERVICE}
   media:
-    upload-path: ${STORAGE_PATH}
+    upload-bucket: ${UPLOAD_BUCKET}
   otel-collector:
     url: ${OTEL_COLLECTOR}
   log:

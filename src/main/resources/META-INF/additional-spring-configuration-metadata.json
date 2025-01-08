@@ -36,9 +36,9 @@
             "description": "URL of auth service to authorize access tokens"
         },
         {
-            "name": "hangout.media.upload-path",
+            "name": "hangout.media.upload-bucket",
             "type": "java.lang.String",
-            "description": "The shared path in which we will place the uploaded multimedia files for further processing"
+            "description": "The Minio/S3 bucket in which we will place the uploaded multimedia files for further processing"
         }
     ]
 }
