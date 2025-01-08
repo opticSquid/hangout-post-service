@@ -42,6 +42,11 @@ management:
           server:
             requests: true
 
+minio:
+  url: http://localhost:9000
+  accessKey: IevColMiX5eBAZUPmfN6
+  secretKey: G8HC3uphX1TlDDYSxtjTrFSVdRe95XJXV2IhqEYg
+
 hangout:
   auth-service:
     url: http://localhost:5011
