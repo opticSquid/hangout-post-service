@@ -1,7 +1,5 @@
 package com.hangout.core.post_api.services;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +24,7 @@ import com.hangout.core.post_api.exceptions.UnauthorizedAccessException;
 import com.hangout.core.post_api.exceptions.UnsupportedMediaType;
 import com.hangout.core.post_api.repositories.MediaRepo;
 import com.hangout.core.post_api.repositories.PostRepo;
+import com.hangout.core.post_api.utils.FileUploadService;
 import com.hangout.core.post_api.utils.HashService;
 
 import io.micrometer.observation.annotation.Observed;
@@ -41,11 +40,10 @@ public class PostService {
     private final MediaRepo mediaRepo;
     private final RestClient restClient;
     private final HashService hashService;
+    private final FileUploadService fileUploadService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     @Value("${hangout.auth-service.url}")
     private String authServiceURL;
-    @Value("${hangout.media.upload-path}")
-    private String storageServicePath;
     @Value("${hangout.kafka.topic}")
     private String topic;
 
@@ -77,9 +75,9 @@ public class PostService {
             } else {
                 // is media is new
                 if (file.getContentType().startsWith("image/") || file.getContentType().startsWith("video/")) {
+                    uploadMedias(session, file, internalFilename);
                     Media media = new Media(internalFilename, file.getContentType());
                     media = this.mediaRepo.save(media);
-                    uploadMedias(session, file, internalFilename);
                     Post post;
                     if (postDescription.isPresent()) {
                         post = new Post(session.userId(), postDescription.get(), media);
@@ -90,6 +88,7 @@ public class PostService {
                     media.addPost(post);
                     this.mediaRepo.save(media);
                     return new PostCreationResponse(post.getPostId());
+
                 } else {
                     throw new UnsupportedMediaType(file.getOriginalFilename()
                             + " is not supported. Please upload a supported format of either image or video file");
@@ -124,8 +123,9 @@ public class PostService {
     // ? kept public for observalibility
     /**
      * upload the file given by the user in the post to storage service.
-     * save the multipart file to the given destination on disk
-     * also produce a kafka event to trigger storage service to process the new file
+     * internally uploads the file to Minio/s3 bucket
+     * also produces a kafka event to trigger storage service to process the new
+     * file
      * 
      * @param session
      * @param file
@@ -133,13 +133,12 @@ public class PostService {
      */
     @Observed(name = "create-post", contextualName = "upload media service")
     public void uploadMedias(Session session, MultipartFile file, String internalFilename) {
+        fileUploadService.uploadFile(internalFilename, file);
         try {
-            file.transferTo(new File(storageServicePath + "/" + internalFilename));
             this.kafkaTemplate.send(topic, file.getContentType(),
                     new FileUploadEvent(internalFilename, session.userId()));
-        } catch (IllegalStateException | IOException e) {
-            throw new FileUploadFailed("Failed to upload file: " +
-                    file.getOriginalFilename());
+        } catch (IllegalStateException e) {
+            throw new FileUploadFailed("Failed to produce kafka event for file: " + file.getOriginalFilename());
         }
     }
 
