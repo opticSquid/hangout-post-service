@@ -1,7 +1,7 @@
 server:
   port: 5013
   servlet:
-    context-path: /content
+    context-path: /post-api
 spring:
   application:
     name: hangout-post-service
@@ -12,8 +12,8 @@ spring:
     password: ${DB_PASSWORD}
   servlet:
     multipart:
-      max-file-size: 5GB
-      max-request-size: 5223MB # aprx 5.1 GB
+      max-file-size: 1GB
+      max-request-size: 1048MB
   jpa:
     properties:
       hibernate:
@@ -59,6 +59,11 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui
+
+minio:
+  url: ${MINIO_SERVER}
+  accessKey: ${MINIO_ACCESS_KEY}
+  secretKey: ${MINIO_SECRET_KEY}
 
 logging:
   level:
