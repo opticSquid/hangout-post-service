@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j
-public class MinIoClientConfig {
+public class MinioClientConfig {
     @Value("${minio.url}")
     private String serverUrl;
     @Value("${minio.accessKey}")
@@ -36,14 +36,17 @@ public class MinIoClientConfig {
                     .endpoint(serverUrl)
                     .credentials(accessKey, secretKey)
                     .build();
+            log.info("Successfully connected with Minio/s3");
+            log.info("checking if bucket {} exists", uploadBucket);
             boolean isBucketExist = minioClient
                     .bucketExists(BucketExistsArgs.builder().bucket(uploadBucket).build());
             if (!isBucketExist) {
+                log.debug("{} bucket does not exist. Trying to create the bucket", uploadBucket);
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(uploadBucket).build());
             } else {
                 log.debug("Bucket {} exists, so skipping creation of the bucket", uploadBucket);
             }
-            log.info("Successfully connected with Minio/s3");
+            log.info("All checks for Minio completed, ready to upload files");
             return minioClient;
         } catch (MinioException ex) {
             log.error("Error occured in connecting with Minio/S3, exception: {}", ex);
