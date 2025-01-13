@@ -145,7 +145,7 @@ public class PostService {
     private Session authorizeUser(String authHeader) {
         ResponseEntity<Session> response = restClient
                 .post()
-                .uri(authServiceURL + "/auth/v1/internal/validate")
+                .uri(authServiceURL + "/auth-api/v1/internal/validate")
                 .body(new UserValidationRequest(authHeader))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
