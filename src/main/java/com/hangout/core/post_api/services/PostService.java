@@ -10,6 +10,8 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hangout.core.post_api.dto.FileUploadEvent;
+import com.hangout.core.post_api.dto.GetPostsDTO;
 import com.hangout.core.post_api.dto.PostCreationResponse;
 import com.hangout.core.post_api.dto.Session;
 import com.hangout.core.post_api.dto.UserValidationRequest;
@@ -51,6 +54,7 @@ public class PostService {
     private String authServiceURL;
     @Value("${hangout.kafka.topic}")
     private String topic;
+    private final Integer pageLength = 25;
 
     @Observed(name = "create-post", contextualName = "create post service")
     @Transactional
@@ -104,8 +108,11 @@ public class PostService {
     }
 
     @Observed(name = "get-all-posts", contextualName = "service")
-    public List<Post> findAll() {
-        return postRepo.findAll();
+    public List<Post> findAll(GetPostsDTO searchParams) {
+        PageRequest page = PageRequest.of(searchParams.pageNumber() - 1 >= 0 ? searchParams.pageNumber() - 1 : 0,
+                pageLength);
+        Slice<Post> postPage = postRepo.findAll(page);
+        return postPage.toList();
     }
 
     public Post getParticularPost(String postId) {

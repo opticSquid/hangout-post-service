@@ -58,7 +58,7 @@ public class PostController {
     @Observed(name = "get-all-posts", contextualName = "controller")
     @GetMapping("/all")
     public List<Post> getAllPosts(@RequestBody GetPostsDTO getPostParams) {
-        return this.postService.findAll();
+        return this.postService.findAll(getPostParams);
     }
 
     @Observed(name = "get-particular-post", contextualName = "controller")
