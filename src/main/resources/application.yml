@@ -84,5 +84,7 @@ hangout:
     upload-bucket: ${UPLOAD_BUCKET}
   otel-collector:
     url: ${OTEL_COLLECTOR}
+  allowed-origns:
+    url: ${CLIENT_ORIGNS}
   log:
     path: ${LOG_DIR}
