@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.geolatte.geom.G2D;
-import org.geolatte.geom.Point;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
