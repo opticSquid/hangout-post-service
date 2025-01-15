@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.Point;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,8 +39,10 @@ public class PostController {
     public ResponseEntity<PostCreationResponse> createPostWithMediasAndText(
             @RequestHeader(name = "Authorization") String authToken,
             @RequestPart(value = "file") MultipartFile file,
-            @RequestPart(value = "postDescription") String postDescription) throws FileUploadException {
-        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.of(postDescription)),
+            @RequestPart(value = "postDescription") String postDescription,
+            @RequestPart(value = "lat") Double lat,
+            @RequestPart(value = "lon") Double lon) throws FileUploadException {
+        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.of(postDescription), lat, lon),
                 HttpStatus.CREATED);
     }
 
@@ -46,8 +50,11 @@ public class PostController {
     @PostMapping(path = "/short", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostCreationResponse> createPostWithMedias(
             @RequestHeader(name = "Authorization") String authToken,
-            @RequestPart(value = "file") MultipartFile file) throws FileUploadException {
-        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.empty()), HttpStatus.CREATED);
+            @RequestPart(value = "file") MultipartFile file,
+            @RequestPart(value = "lat") Double lat,
+            @RequestPart(value = "lon") Double lon) throws FileUploadException {
+        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.empty(), lat, lon),
+                HttpStatus.CREATED);
     }
 
     @Observed(name = "get-all-posts", contextualName = "controller")

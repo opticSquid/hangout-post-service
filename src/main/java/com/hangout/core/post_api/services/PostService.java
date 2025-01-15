@@ -5,6 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +46,7 @@ public class PostService {
     private final HashService hashService;
     private final FileUploadService fileUploadService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     @Value("${hangout.auth-service.url}")
     private String authServiceURL;
     @Value("${hangout.kafka.topic}")
@@ -50,12 +55,13 @@ public class PostService {
     @Observed(name = "create-post", contextualName = "create post service")
     @Transactional
     public PostCreationResponse create(String authToken, MultipartFile file,
-            Optional<String> postDescription) throws FileUploadException {
+            Optional<String> postDescription, Double lat, Double lon) throws FileUploadException {
         Session session = authorizeUser(authToken);
         // check if the session is trusted
         if (!session.trustedDevice()) {
             throw new UnauthorizedAccessException("Can not create new post from an untrusted device");
         } else {
+            Point location = buildPoint(lat, lon);
             // check if media is already present in database
             String internalFilename;
             internalFilename = this.hashService.computeInternalFilename(file);
@@ -64,9 +70,9 @@ public class PostService {
                 Media media = existingMedia.get();
                 Post post;
                 if (postDescription.isPresent()) {
-                    post = new Post(session.userId(), postDescription.get(), media);
+                    post = new Post(session.userId(), media, postDescription.get(), location);
                 } else {
-                    post = new Post(session.userId(), media);
+                    post = new Post(session.userId(), media, location);
                 }
                 post = this.postRepo.save(post);
                 media.addPost(post);
@@ -80,9 +86,9 @@ public class PostService {
                     media = this.mediaRepo.save(media);
                     Post post;
                     if (postDescription.isPresent()) {
-                        post = new Post(session.userId(), postDescription.get(), media);
+                        post = new Post(session.userId(), media, postDescription.get(), location);
                     } else {
-                        post = new Post(session.userId(), media);
+                        post = new Post(session.userId(), media, location);
                     }
                     post = this.postRepo.save(post);
                     media.addPost(post);
@@ -156,6 +162,10 @@ public class PostService {
             throw new UnauthorizedAccessException(
                     "User is not valid or user does not have permission to perform current action");
         }
+    }
+
+    private Point buildPoint(Double lat, Double lon) {
+        return geometryFactory.createPoint(new Coordinate(lon, lat));
     }
 
 }
