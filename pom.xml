@@ -20,7 +20,7 @@
 		<minio.version>8.5.14</minio.version>
 		<spring-doc.version>2.6.0</spring-doc.version>
 		<otel-appender.version>2.10.0-alpha</otel-appender.version>
-
+		<geolatte.version>1.9.1</geolatte.version>
 	</properties>
 	<dependencies>
 		<!--START
@@ -98,6 +98,11 @@
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
 			<version>${minio.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geolatte</groupId>
+			<artifactId>geolatte-geojson</artifactId>
+			<version>${geolatte.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>

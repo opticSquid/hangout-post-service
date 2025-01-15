@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hangout.core.post_api.dto.GetPostsDTO;
 import com.hangout.core.post_api.dto.PostCreationResponse;
 import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.services.PostService;
 
 import io.micrometer.observation.annotation.Observed;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -50,7 +52,7 @@ public class PostController {
 
     @Observed(name = "get-all-posts", contextualName = "controller")
     @GetMapping("/all")
-    public List<Post> getAllPosts() {
+    public List<Post> getAllPosts(@RequestBody GetPostsDTO getPostParams) {
         return this.postService.findAll();
     }
 
