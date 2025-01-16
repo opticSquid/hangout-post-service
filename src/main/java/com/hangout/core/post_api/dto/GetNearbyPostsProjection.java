@@ -1,10 +1,11 @@
 package com.hangout.core.post_api.dto;
 
 import java.math.BigInteger;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
-import org.locationtech.jts.geom.Point;
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.Point;
 
 public interface GetNearbyPostsProjection {
     UUID getPostId();
@@ -23,9 +24,9 @@ public interface GetNearbyPostsProjection {
 
     Integer getInteractions();
 
-    ZonedDateTime getCreatedAt();
+    Instant getCreatedAt();
 
-    Point getLocation();
+    Point<G2D> getLocation();
 
     Double getDistance();
 }

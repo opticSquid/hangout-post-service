@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,7 +23,6 @@ import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.services.PostService;
 
 import io.micrometer.observation.annotation.Observed;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -56,7 +56,7 @@ public class PostController {
     }
 
     @Observed(name = "get-all-posts", contextualName = "controller")
-    @GetMapping("/all")
+    @GetMapping("/near-me")
     public PostsList getNearByPosts(@RequestBody GetPostsDTO getPostParams) {
         return this.postService.findNearByPosts(getPostParams);
     }

@@ -109,6 +109,7 @@ public class PostService {
 
     @Observed(name = "get-near-by-posts", contextualName = "service")
     public PostsList findNearByPosts(GetPostsDTO searchParams) {
+        log.debug("search params: {}", searchParams);
         Integer pageNumber = searchParams.pageNumber() > 1 ? searchParams.pageNumber() : 1;
         Integer offset = pageLength * (pageNumber - 1);
         Point userLocation = buildPoint(searchParams.lat(), searchParams.lon());
@@ -116,11 +117,11 @@ public class PostService {
                 searchParams.searchRadius(), offset, pageLength);
         PostsList postsList;
         // * only return the count of all the posts in the first page itself.
-        if (pageNumber == 0) {
+        if (pageNumber == 1) {
             Integer totalCount = postRepo.getAllNearbyPostsCount(userLocation, searchParams.searchRadius());
-            postsList = new PostsList(nearbyPosts, Optional.of(totalCount));
+            postsList = new PostsList(nearbyPosts, totalCount);
         } else {
-            postsList = new PostsList(nearbyPosts, Optional.empty());
+            postsList = new PostsList(nearbyPosts, null);
         }
         return postsList;
     }
