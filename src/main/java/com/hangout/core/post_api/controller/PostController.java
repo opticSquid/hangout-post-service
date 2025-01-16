@@ -1,6 +1,5 @@
 package com.hangout.core.post_api.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hangout.core.post_api.dto.GetPostsDTO;
 import com.hangout.core.post_api.dto.PostCreationResponse;
+import com.hangout.core.post_api.dto.PostsList;
 import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.services.PostService;
 
@@ -57,8 +57,8 @@ public class PostController {
 
     @Observed(name = "get-all-posts", contextualName = "controller")
     @GetMapping("/all")
-    public List<Post> getAllPosts(@RequestBody GetPostsDTO getPostParams) {
-        return this.postService.findAll(getPostParams);
+    public PostsList getNearByPosts(@RequestBody GetPostsDTO getPostParams) {
+        return this.postService.findNearByPosts(getPostParams);
     }
 
     @Observed(name = "get-particular-post", contextualName = "controller")

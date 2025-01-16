@@ -10,8 +10,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -20,8 +18,10 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hangout.core.post_api.dto.FileUploadEvent;
+import com.hangout.core.post_api.dto.GetNearbyPostsProjection;
 import com.hangout.core.post_api.dto.GetPostsDTO;
 import com.hangout.core.post_api.dto.PostCreationResponse;
+import com.hangout.core.post_api.dto.PostsList;
 import com.hangout.core.post_api.dto.Session;
 import com.hangout.core.post_api.dto.UserValidationRequest;
 import com.hangout.core.post_api.entities.Media;
@@ -107,12 +107,22 @@ public class PostService {
         }
     }
 
-    @Observed(name = "get-all-posts", contextualName = "service")
-    public List<Post> findAll(GetPostsDTO searchParams) {
-        PageRequest page = PageRequest.of(searchParams.pageNumber() - 1 >= 0 ? searchParams.pageNumber() - 1 : 0,
-                pageLength);
-        Slice<Post> postPage = postRepo.findAll(page);
-        return postPage.toList();
+    @Observed(name = "get-near-by-posts", contextualName = "service")
+    public PostsList findNearByPosts(GetPostsDTO searchParams) {
+        Integer pageNumber = searchParams.pageNumber() > 1 ? searchParams.pageNumber() : 1;
+        Integer offset = pageLength * (pageNumber - 1);
+        Point userLocation = buildPoint(searchParams.lat(), searchParams.lon());
+        List<GetNearbyPostsProjection> nearbyPosts = postRepo.getAllNearbyPosts(userLocation,
+                searchParams.searchRadius(), offset, pageLength);
+        PostsList postsList;
+        // * only return the count of all the posts in the first page itself.
+        if (pageNumber == 0) {
+            Integer totalCount = postRepo.getAllNearbyPostsCount(userLocation, searchParams.searchRadius());
+            postsList = new PostsList(nearbyPosts, Optional.of(totalCount));
+        } else {
+            postsList = new PostsList(nearbyPosts, Optional.empty());
+        }
+        return postsList;
     }
 
     public Post getParticularPost(String postId) {
@@ -133,7 +143,6 @@ public class PostService {
         postRepo.increaseHeartCount(postId);
     }
 
-    // ? kept public for observalibility
     /**
      * upload the file given by the user in the post to storage service.
      * internally uploads the file to Minio/s3 bucket
@@ -145,7 +154,7 @@ public class PostService {
      * @param internalFilename
      */
     @Observed(name = "create-post", contextualName = "upload media service")
-    public void uploadMedias(Session session, MultipartFile file, String internalFilename) {
+    private void uploadMedias(Session session, MultipartFile file, String internalFilename) {
         fileUploadService.uploadFile(internalFilename, file);
         try {
             this.kafkaTemplate.send(topic, file.getContentType(),
