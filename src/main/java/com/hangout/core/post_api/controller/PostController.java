@@ -61,7 +61,7 @@ public class PostController {
     }
 
     @Observed(name = "get-all-posts", contextualName = "controller")
-    @GetMapping("/near-me")
+    @PostMapping("/near-me")
     public PostsList getNearByPosts(@RequestBody GetPostsDTO getPostParams) {
         return this.postService.findNearByPosts(getPostParams);
     }
