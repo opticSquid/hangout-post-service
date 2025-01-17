@@ -22,6 +22,9 @@ create table
         primary key (keeperid)
     );
 
+-- create sequence if not exists hierarchy_keeper_seq start
+-- with
+--     1 increment by 50;
 create table
     if not exists media (
         filename varchar(513) not null,
@@ -33,6 +36,14 @@ create table
     );
 
 create table
+    if not exists address (
+        address_id integer not null,
+        city varchar(255),
+        state varchar(255),
+        primary key (address_id)
+    );
+
+create table
     if not exists post (
         post_id uuid not null,
         comments integer,
@@ -41,6 +52,7 @@ create table
             time zone,
             hearts integer,
             interactions integer,
+            address integer,
             location geography (Point, 4326),
             owner_id numeric(38, 0),
             post_description varchar(500),
@@ -48,10 +60,6 @@ create table
             filename varchar(513),
             primary key (post_id)
     );
-
-create sequence if not exists hierarchy_keeper_seq start
-with
-    1 increment by 50;
 
 -- Adding a QuadTree GiST index on the geometry colum for faster search
 CREATE INDEX CONCURRENTLY IF NOT EXISTS locationIndex ON post USING GIST (location);

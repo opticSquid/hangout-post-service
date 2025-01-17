@@ -38,9 +38,12 @@ public class PostController {
             @RequestHeader(name = "Authorization") String authToken,
             @RequestPart(value = "file") MultipartFile file,
             @RequestPart(value = "postDescription") String postDescription,
+            @RequestPart(value = "state") String state,
+            @RequestPart(value = "city") String city,
             @RequestPart(value = "lat") Double lat,
             @RequestPart(value = "lon") Double lon) throws FileUploadException {
-        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.of(postDescription), lat, lon),
+        return new ResponseEntity<>(
+                this.postService.create(authToken, file, Optional.of(postDescription), state, city, lat, lon),
                 HttpStatus.CREATED);
     }
 
@@ -49,9 +52,11 @@ public class PostController {
     public ResponseEntity<PostCreationResponse> createPostWithMedias(
             @RequestHeader(name = "Authorization") String authToken,
             @RequestPart(value = "file") MultipartFile file,
+            @RequestPart(value = "state") String state,
+            @RequestPart(value = "city") String city,
             @RequestPart(value = "lat") Double lat,
             @RequestPart(value = "lon") Double lon) throws FileUploadException {
-        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.empty(), lat, lon),
+        return new ResponseEntity<>(this.postService.create(authToken, file, Optional.empty(), state, city, lat, lon),
                 HttpStatus.CREATED);
     }
 

@@ -36,6 +36,9 @@ public class Post {
     private Media media;
     @Column(length = 500)
     private String postDescription;
+    @ManyToOne
+    @JoinColumn(name = "address")
+    private Address address;
     @Column(columnDefinition = "geography(Point,4326)")
     private Point location;
     @JsonProperty(access = Access.READ_ONLY)
@@ -49,16 +52,18 @@ public class Post {
     @JsonIgnore
     private final Boolean publish = true;
 
-    public Post(BigInteger ownerId, Media media, String postDescription, Point location) {
+    public Post(BigInteger ownerId, Media media, String postDescription, Address address, Point location) {
         this.ownerId = ownerId;
         this.media = media;
         this.postDescription = postDescription;
+        this.address = address;
         this.location = location;
     }
 
-    public Post(BigInteger ownerId, Media media, Point location) {
+    public Post(BigInteger ownerId, Media media, Address address, Point location) {
         this.ownerId = ownerId;
         this.media = media;
+        this.address = address;
         this.location = location;
     }
 }

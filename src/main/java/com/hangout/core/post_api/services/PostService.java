@@ -24,6 +24,7 @@ import com.hangout.core.post_api.dto.PostCreationResponse;
 import com.hangout.core.post_api.dto.PostsList;
 import com.hangout.core.post_api.dto.Session;
 import com.hangout.core.post_api.dto.UserValidationRequest;
+import com.hangout.core.post_api.entities.Address;
 import com.hangout.core.post_api.entities.Media;
 import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.exceptions.FileUploadFailed;
@@ -59,12 +60,14 @@ public class PostService {
     @Observed(name = "create-post", contextualName = "create post service")
     @Transactional
     public PostCreationResponse create(String authToken, MultipartFile file,
-            Optional<String> postDescription, Double lat, Double lon) throws FileUploadException {
+            Optional<String> postDescription, String state, String city, Double lat, Double lon)
+            throws FileUploadException {
         Session session = authorizeUser(authToken);
         // check if the session is trusted
         if (!session.trustedDevice()) {
             throw new UnauthorizedAccessException("Can not create new post from an untrusted device");
         } else {
+            Address address = new Address(state, city);
             Point location = buildPoint(lat, lon);
             // check if media is already present in database
             String internalFilename;
@@ -74,9 +77,9 @@ public class PostService {
                 Media media = existingMedia.get();
                 Post post;
                 if (postDescription.isPresent()) {
-                    post = new Post(session.userId(), media, postDescription.get(), location);
+                    post = new Post(session.userId(), media, postDescription.get(), address, location);
                 } else {
-                    post = new Post(session.userId(), media, location);
+                    post = new Post(session.userId(), media, address, location);
                 }
                 post = this.postRepo.save(post);
                 media.addPost(post);
@@ -90,9 +93,9 @@ public class PostService {
                     media = this.mediaRepo.save(media);
                     Post post;
                     if (postDescription.isPresent()) {
-                        post = new Post(session.userId(), media, postDescription.get(), location);
+                        post = new Post(session.userId(), media, postDescription.get(), address, location);
                     } else {
-                        post = new Post(session.userId(), media, location);
+                        post = new Post(session.userId(), media, address, location);
                     }
                     post = this.postRepo.save(post);
                     media.addPost(post);
