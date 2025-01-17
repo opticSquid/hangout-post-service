@@ -36,14 +36,6 @@ create table
     );
 
 create table
-    if not exists address (
-        address_id integer not null,
-        city varchar(255),
-        state varchar(255),
-        primary key (address_id)
-    );
-
-create table
     if not exists post (
         post_id uuid not null,
         comments integer,
@@ -53,6 +45,8 @@ create table
             hearts integer,
             interactions integer,
             address integer,
+            city varchar(255),
+            state varchar(255),
             location geography (Point, 4326),
             owner_id numeric(38, 0),
             post_description varchar(500),

@@ -26,6 +26,10 @@ public interface GetNearbyPostsProjection {
 
     Instant getCreatedAt();
 
+    String getState();
+
+    String getCity();
+
     Point<G2D> getLocation();
 
     Double getDistance();
