@@ -3,6 +3,8 @@ package com.hangout.core.post_api.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,6 +24,7 @@ public class Media {
     private String contentType;
     @OneToMany(mappedBy = "media")
     private List<Post> posts;
+    @JsonIgnore
     @Enumerated(value = EnumType.STRING)
     private ProcessStatus processStatus;
 

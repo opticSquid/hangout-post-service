@@ -5,6 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +18,10 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hangout.core.post_api.dto.FileUploadEvent;
+import com.hangout.core.post_api.dto.GetNearbyPostsProjection;
+import com.hangout.core.post_api.dto.GetPostsDTO;
 import com.hangout.core.post_api.dto.PostCreationResponse;
+import com.hangout.core.post_api.dto.PostsList;
 import com.hangout.core.post_api.dto.Session;
 import com.hangout.core.post_api.dto.UserValidationRequest;
 import com.hangout.core.post_api.entities.Media;
@@ -42,20 +49,24 @@ public class PostService {
     private final HashService hashService;
     private final FileUploadService fileUploadService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     @Value("${hangout.auth-service.url}")
     private String authServiceURL;
     @Value("${hangout.kafka.topic}")
     private String topic;
+    private final Integer pageLength = 25;
 
     @Observed(name = "create-post", contextualName = "create post service")
     @Transactional
     public PostCreationResponse create(String authToken, MultipartFile file,
-            Optional<String> postDescription) throws FileUploadException {
+            Optional<String> postDescription, String state, String city, Double lat, Double lon)
+            throws FileUploadException {
         Session session = authorizeUser(authToken);
         // check if the session is trusted
         if (!session.trustedDevice()) {
             throw new UnauthorizedAccessException("Can not create new post from an untrusted device");
         } else {
+            Point location = buildPoint(lat, lon);
             // check if media is already present in database
             String internalFilename;
             internalFilename = this.hashService.computeInternalFilename(file);
@@ -64,9 +75,9 @@ public class PostService {
                 Media media = existingMedia.get();
                 Post post;
                 if (postDescription.isPresent()) {
-                    post = new Post(session.userId(), postDescription.get(), media);
+                    post = new Post(session.userId(), media, postDescription.get(), state, city, location);
                 } else {
-                    post = new Post(session.userId(), media);
+                    post = new Post(session.userId(), media, state, city, location);
                 }
                 post = this.postRepo.save(post);
                 media.addPost(post);
@@ -80,9 +91,9 @@ public class PostService {
                     media = this.mediaRepo.save(media);
                     Post post;
                     if (postDescription.isPresent()) {
-                        post = new Post(session.userId(), postDescription.get(), media);
+                        post = new Post(session.userId(), media, postDescription.get(), state, city, location);
                     } else {
-                        post = new Post(session.userId(), media);
+                        post = new Post(session.userId(), media, state, city, location);
                     }
                     post = this.postRepo.save(post);
                     media.addPost(post);
@@ -97,9 +108,23 @@ public class PostService {
         }
     }
 
-    @Observed(name = "get-all-posts", contextualName = "service")
-    public List<Post> findAll() {
-        return postRepo.findAll();
+    @Observed(name = "get-near-by-posts", contextualName = "service")
+    public PostsList findNearByPosts(GetPostsDTO searchParams) {
+        log.debug("search params: {}", searchParams);
+        Integer pageNumber = searchParams.pageNumber() > 1 ? searchParams.pageNumber() : 1;
+        Integer offset = pageLength * (pageNumber - 1);
+        Point userLocation = buildPoint(searchParams.lat(), searchParams.lon());
+        List<GetNearbyPostsProjection> nearbyPosts = postRepo.getAllNearbyPosts(userLocation,
+                searchParams.searchRadius(), offset, pageLength);
+        PostsList postsList;
+        // * only return the count of all the posts in the first page itself.
+        if (pageNumber == 1) {
+            Integer totalCount = postRepo.getAllNearbyPostsCount(userLocation, searchParams.searchRadius());
+            postsList = new PostsList(nearbyPosts, totalCount);
+        } else {
+            postsList = new PostsList(nearbyPosts, null);
+        }
+        return postsList;
     }
 
     public Post getParticularPost(String postId) {
@@ -120,7 +145,6 @@ public class PostService {
         postRepo.increaseHeartCount(postId);
     }
 
-    // ? kept public for observalibility
     /**
      * upload the file given by the user in the post to storage service.
      * internally uploads the file to Minio/s3 bucket
@@ -132,7 +156,7 @@ public class PostService {
      * @param internalFilename
      */
     @Observed(name = "create-post", contextualName = "upload media service")
-    public void uploadMedias(Session session, MultipartFile file, String internalFilename) {
+    private void uploadMedias(Session session, MultipartFile file, String internalFilename) {
         fileUploadService.uploadFile(internalFilename, file);
         try {
             this.kafkaTemplate.send(topic, file.getContentType(),
@@ -156,6 +180,10 @@ public class PostService {
             throw new UnauthorizedAccessException(
                     "User is not valid or user does not have permission to perform current action");
         }
+    }
+
+    private Point buildPoint(Double lat, Double lon) {
+        return geometryFactory.createPoint(new Coordinate(lon, lat));
     }
 
 }

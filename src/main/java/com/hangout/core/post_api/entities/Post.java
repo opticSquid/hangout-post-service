@@ -5,6 +5,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import org.locationtech.jts.geom.Point;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -33,6 +36,10 @@ public class Post {
     private Media media;
     @Column(length = 500)
     private String postDescription;
+    private String state;
+    private String city;
+    @Column(columnDefinition = "geography(Point,4326)")
+    private Point location;
     @JsonProperty(access = Access.READ_ONLY)
     private final Integer hearts = 0;
     @JsonProperty(access = Access.READ_ONLY)
@@ -41,17 +48,23 @@ public class Post {
     private final Integer interactions = 0;
     @JsonProperty(access = Access.READ_ONLY)
     private final ZonedDateTime createdAt = ZonedDateTime.now(ZoneOffset.UTC);
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     private final Boolean publish = true;
 
-    public Post(BigInteger ownerId, String postDescription, Media media) {
+    public Post(BigInteger ownerId, Media media, String postDescription, String state, String city, Point location) {
         this.ownerId = ownerId;
-        this.postDescription = postDescription;
         this.media = media;
+        this.postDescription = postDescription;
+        this.state = state;
+        this.city = city;
+        this.location = location;
     }
 
-    public Post(BigInteger ownerId, Media media) {
+    public Post(BigInteger ownerId, Media media, String state, String city, Point location) {
         this.ownerId = ownerId;
         this.media = media;
+        this.state = state;
+        this.city = city;
+        this.location = location;
     }
 }

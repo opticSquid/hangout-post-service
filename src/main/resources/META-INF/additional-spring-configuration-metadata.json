@@ -39,6 +39,11 @@
             "name": "hangout.media.upload-bucket",
             "type": "java.lang.String",
             "description": "The Minio/S3 bucket in which we will place the uploaded multimedia files for further processing"
+        },
+        {
+            "name": "hangout.allowed-origns.url",
+            "type": "java.lang.String",
+            "description": "Comma seperated values of the frontend urls that we should allow"
         }
     ]
 }

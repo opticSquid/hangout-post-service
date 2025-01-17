@@ -5,16 +5,20 @@ server:
 spring:
   application:
     name: hangout-post-service
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1048MB
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${DB_URL}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-  servlet:
-    multipart:
-      max-file-size: 1GB
-      max-request-size: 1048MB
+  sql:
+    init:
+      mode: always
   jpa:
+    # database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
     properties:
       hibernate:
         "[format_sql]": true
@@ -84,5 +88,7 @@ hangout:
     upload-bucket: ${UPLOAD_BUCKET}
   otel-collector:
     url: ${OTEL_COLLECTOR}
+  allowed-origns:
+    url: ${CLIENT_ORIGNS}
   log:
     path: ${LOG_DIR}
