@@ -56,5 +56,6 @@ hangout:
     url: http://localhost:4318
   allowed-origns:
     url: http://localhost:3000
+  page-length: 25
   log:
     path: /home/soumalya/Development/Hangout/core-services/hangout-post-api/logs

@@ -44,6 +44,11 @@
             "name": "hangout.allowed-origns.url",
             "type": "java.lang.String",
             "description": "Comma seperated values of the frontend urls that we should allow"
+        },
+        {
+            "name": "hangout.page-length",
+            "type": "java.lang.Integer",
+            "description": "Total number of items to be contained in a page for paginated responses"
         }
     ]
 }

@@ -38,12 +38,17 @@ public interface PostRepo extends JpaRepository<Post, UUID> {
         @Query(value = "UPDATE post SET publish = true where post_id = :postid", nativeQuery = true)
         void publish(@Param("postid") UUID posUuid);
 
-        @Query(value = "SELECT P.POST_ID, P.OWNER_ID, M.FILENAME, M.CONTENT_TYPE, P.POST_DESCRIPTION, P.HEARTS, P.COMMENTS, P.INTERACTIONS, P.CREATED_AT, P.STATE, P.CITY, P.LOCATION, ST_DISTANCE(:userLocation, P.LOCATION) AS DISTANCE FROM POST P JOIN MEDIA M ON P.FILENAME = M.FILENAME WHERE ST_DWITHIN(:userLocation, P.LOCATION, :searchRadius) = TRUE OFFSET :offset LIMIT :limit;", nativeQuery = true)
-        List<GetNearbyPostsProjection> getAllNearbyPosts(@Param("userLocation") Point userLocation,
-                        @Param("searchRadius") Double searchRadius,
-                        @Param("offset") Integer offset, @Param("limit") Integer limit);
+        @Query(value = "SELECT P.POST_ID, P.OWNER_ID, M.FILENAME, M.CONTENT_TYPE, P.POST_DESCRIPTION, P.HEARTS, P.COMMENTS, P.INTERACTIONS, P.CREATED_AT, P.STATE, P.CITY, P.LOCATION, ST_DISTANCE(:userLocation, P.LOCATION) AS DISTANCE FROM POST P JOIN MEDIA M ON P.FILENAME = M.FILENAME WHERE ST_DWITHIN(:userLocation, P.LOCATION, :maxSearchRadius) AND NOT ST_DWITHIN(:userLocation, P.LOCATION, :minSearchRadius) OFFSET :offset LIMIT :limit;", nativeQuery = true)
+        List<GetNearbyPostsProjection> getAllNearbyPosts(
+                        @Param("userLocation") Point userLocation,
+                        @Param("minSearchRadius") Double minSearchRadius,
+                        @Param("maxSearchRadius") Double maxSearchRadius,
+                        @Param("offset") Integer offset,
+                        @Param("limit") Integer limit);
 
-        @Query(value = "SELECT COUNT(*) AS POST_COUNT  FROM POST P JOIN MEDIA M ON P.FILENAME = M.FILENAME WHERE ST_DWITHIN(:userLocation, P.LOCATION, :searchRadius) = TRUE;", nativeQuery = true)
-        Integer getAllNearbyPostsCount(@Param("userLocation") Point userLocation,
-                        @Param("searchRadius") Double searchRadius);
+        @Query(value = "SELECT COUNT(*) AS POST_COUNT  FROM POST P JOIN MEDIA M ON P.FILENAME = M.FILENAME WHERE ST_DWITHIN(:userLocation, P.LOCATION, :maxSearchRadius) AND NOT ST_DWITHIN(:userLocation, P.LOCATION, :minSearchRadius);", nativeQuery = true)
+        Integer getAllNearbyPostsCount(
+                        @Param("userLocation") Point userLocation,
+                        @Param("minSearchRadius") Double minSearchRadius,
+                        @Param("maxSearchRadius") Double maxSearchRadius);
 }
