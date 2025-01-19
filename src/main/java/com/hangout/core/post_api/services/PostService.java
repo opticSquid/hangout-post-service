@@ -54,7 +54,8 @@ public class PostService {
     private String authServiceURL;
     @Value("${hangout.kafka.topic}")
     private String topic;
-    private final Integer pageLength = 25;
+    @Value("${hangout.page-length}")
+    private Integer pageLength;
 
     @Observed(name = "create-post", contextualName = "create post service")
     @Transactional
@@ -115,12 +116,14 @@ public class PostService {
         Integer offset = pageLength * (pageNumber - 1);
         Point userLocation = buildPoint(searchParams.lat(), searchParams.lon());
         List<GetNearbyPostsProjection> nearbyPosts = postRepo.getAllNearbyPosts(userLocation,
-                searchParams.searchRadius(), offset, pageLength);
+                searchParams.minSearchRadius(), searchParams.maxSearchRadius(), offset, pageLength);
         PostsList postsList;
         // * only return the count of all the posts in the first page itself.
         if (pageNumber == 1) {
-            Integer totalCount = postRepo.getAllNearbyPostsCount(userLocation, searchParams.searchRadius());
-            postsList = new PostsList(nearbyPosts, totalCount);
+            Integer totalCount = postRepo.getAllNearbyPostsCount(userLocation, searchParams.minSearchRadius(),
+                    searchParams.maxSearchRadius());
+            Integer totalPages = (int) Math.ceil((double) totalCount / pageLength);
+            postsList = new PostsList(nearbyPosts, totalPages);
         } else {
             postsList = new PostsList(nearbyPosts, null);
         }

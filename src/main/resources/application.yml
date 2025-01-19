@@ -90,5 +90,6 @@ hangout:
     url: ${OTEL_COLLECTOR}
   allowed-origns:
     url: ${CLIENT_ORIGINS}
+  page-length: ${PAGE_LENGTH}
   log:
     path: ${LOG_DIR}

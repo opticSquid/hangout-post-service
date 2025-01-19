@@ -2,6 +2,6 @@ package com.hangout.core.post_api.dto;
 
 import java.util.List;
 
-public record PostsList(List<GetNearbyPostsProjection> posts, Integer totalCount) {
+public record PostsList(List<GetNearbyPostsProjection> posts, Integer totalPages) {
 
 }
