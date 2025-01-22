@@ -81,7 +81,12 @@ logging:
 
 hangout:
   kafka:
-    topic: content
+    content:
+      topic: content
+    comment:
+      topic: comments
+    heart:
+      topic: hearts
   auth-service:
     url: ${AUTH_SERVICE}
   media:
