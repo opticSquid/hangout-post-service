@@ -130,10 +130,10 @@ public class PostService {
         return postsList;
     }
 
-    public Post getParticularPost(String postId) {
-        Optional<Post> maybepost = postRepo.findById(UUID.fromString(postId));
+    public Post getParticularPost(UUID postId) {
+        Optional<Post> maybepost = postRepo.findById(postId);
         if (maybepost.isPresent()) {
-            postRepo.increaseInteractionCount(UUID.fromString(postId));
+            postRepo.increaseInteractionCount(postId);
             return maybepost.get();
         } else {
             return null;

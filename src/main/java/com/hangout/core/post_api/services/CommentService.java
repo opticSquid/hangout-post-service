@@ -49,13 +49,13 @@ public class CommentService {
 
     @Transactional
     public String createSubComments(Reply reply) {
-        Optional<Comment> maybeParentComment = commentRepo.findById(UUID.fromString(reply.parentCommentId()));
+        Optional<Comment> maybeParentComment = commentRepo.findById(reply.parentCommentId());
         if (maybeParentComment.isPresent()) {
             Comment parentComment = maybeParentComment.get();
             Comment childComment = new Comment();
             childComment.setTopLevel(false);
             childComment.setText(reply.comment());
-            Post post = postService.getParticularPost(parentComment.getPost().getPostId().toString());
+            Post post = postService.getParticularPost(parentComment.getPost().getPostId());
             childComment.setPost(post);
             postService.increaseCommentCount(post.getPostId());
             childComment = saveComment(childComment);

@@ -1,6 +1,7 @@
 package com.hangout.core.post_api.controller;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
@@ -68,7 +69,7 @@ public class PostController {
 
     @Observed(name = "get-particular-post", contextualName = "controller")
     @GetMapping("/{postId}")
-    public Post getAParticularPost(@PathVariable String postId) {
+    public Post getAParticularPost(@PathVariable UUID postId) {
         return this.postService.getParticularPost(postId);
     }
 }
