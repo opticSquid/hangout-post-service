@@ -69,8 +69,8 @@ public class CommentService {
         }
     }
 
-    public List<CommentDTO> fetchTopLevelCommentsForAPost(String postId) {
-        UUID postIdAsUUID = UUID.fromString(postId);
+    public List<CommentDTO> fetchTopLevelCommentsForAPost(UUID postId) {
+        UUID postIdAsUUID = postId;
         List<FetchCommentProjection> model = commentRepo.fetchTopLevelComments(postIdAsUUID);
         return model.stream()
                 .map(comment -> new CommentDTO(comment.getCommentid(),
@@ -79,8 +79,8 @@ public class CommentService {
                 .toList();
     }
 
-    public List<CommentDTO> fetchAllChildCommentsForAComment(String parentCommentId) {
-        UUID parentCommentIdUUID = UUID.fromString(parentCommentId);
+    public List<CommentDTO> fetchAllChildCommentsForAComment(UUID parentCommentId) {
+        UUID parentCommentIdUUID = parentCommentId;
         List<FetchCommentProjection> model = hkRepo.findAllChildComments(parentCommentIdUUID);
         return model.stream()
                 .map(comment -> new CommentDTO(comment.getCommentid(),
