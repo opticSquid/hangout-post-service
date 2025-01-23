@@ -40,7 +40,7 @@ spring:
         spring:
           json:
             trusted:
-              packages: com.hangout.core.post_api.dto
+              packages: com.hangout.core.post_api.dto.event
 
 # All traces should be sent to latency analysis tool
 management:

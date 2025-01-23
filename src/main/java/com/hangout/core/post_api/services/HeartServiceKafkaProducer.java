@@ -1,6 +1,5 @@
 package com.hangout.core.post_api.services;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -10,54 +9,53 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import com.hangout.core.post_api.dto.ActionType;
 import com.hangout.core.post_api.dto.DefaultResponse;
-import com.hangout.core.post_api.dto.NewCommentRequest;
-import com.hangout.core.post_api.dto.Reply;
+import com.hangout.core.post_api.dto.NewHeartRequest;
 import com.hangout.core.post_api.dto.Session;
 import com.hangout.core.post_api.dto.UserValidationRequest;
-import com.hangout.core.post_api.dto.event.CommentEvent;
+import com.hangout.core.post_api.dto.event.HeartEvent;
 import com.hangout.core.post_api.exceptions.UnauthorizedAccessException;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CommentServiceKafkaProducer {
+public class HeartServiceKafkaProducer {
     private final RestClient restClient;
-    private final KafkaTemplate<UUID, CommentEvent> kafkaTemplate;
+    private final KafkaTemplate<UUID, HeartEvent> kafkaTemplate;
     @Value("${hangout.auth-service.url}")
     private String authServiceURL;
-    @Value("${hangout.kafka.comment.topic}")
-    private String commentTopic;
+    @Value("${hangout.kafka.heart.topic}")
+    private String heartTopic;
 
-    public DefaultResponse createTopLevelComment(String authToken, NewCommentRequest comment) {
+    public DefaultResponse addHeart(String authToken, NewHeartRequest heartRequest) {
         Session session = authorizeUser(authToken);
         if (session.userId() != null) {
-            kafkaTemplate.send(commentTopic,
-                    new CommentEvent(comment.postId(), session.userId(), Optional.empty(), comment.comment()));
-            return new DefaultResponse("comment posted");
+            kafkaTemplate.send(heartTopic,
+                    new HeartEvent(ActionType.ADD, heartRequest.postId(), session.userId()));
+            return new DefaultResponse("hearted post");
         } else {
-            return new DefaultResponse("user not authorized, can not post comment");
+            return new DefaultResponse("user not authorized can not heart post");
         }
     }
 
-    public DefaultResponse createSubComments(String authToken, Reply reply) {
+    public DefaultResponse removeHeart(String authToken, NewHeartRequest heartRequest) {
         Session session = authorizeUser(authToken);
         if (session.userId() != null) {
-            kafkaTemplate.send(commentTopic,
-                    new CommentEvent(reply.postId(), session.userId(), Optional.of(reply.parentCommentId()),
-                            reply.comment()));
-            return new DefaultResponse("comment posted");
+            kafkaTemplate.send(heartTopic,
+                    new HeartEvent(ActionType.REMOVE, heartRequest.postId(), session.userId()));
+            return new DefaultResponse("remvoed heart from post");
         } else {
-            return new DefaultResponse("user not authorized, can not post comment");
+            return new DefaultResponse("user not authorized can not remove heart from post");
         }
     }
 
-    private Session authorizeUser(String authHeader) {
+    private Session authorizeUser(String authToken) {
         ResponseEntity<Session> response = restClient
                 .post()
                 .uri(authServiceURL + "/auth-api/v1/internal/validate")
-                .body(new UserValidationRequest(authHeader))
+                .body(new UserValidationRequest(authToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .toEntity(Session.class);

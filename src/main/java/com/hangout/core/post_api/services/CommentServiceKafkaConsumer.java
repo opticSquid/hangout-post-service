@@ -2,11 +2,10 @@ package com.hangout.core.post_api.services;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import com.hangout.core.post_api.dto.NewCommentEvent;
+import com.hangout.core.post_api.dto.event.CommentEvent;
 import com.hangout.core.post_api.entities.Comment;
 import com.hangout.core.post_api.entities.HierarchyKeeper;
 import com.hangout.core.post_api.entities.Post;
@@ -24,11 +23,9 @@ public class CommentServiceKafkaConsumer {
     private final HierarchyKeeperRepo hkRepo;
     private final PostRepo postRepo;
     private final PostService postService;
-    @Value("${hangout.kafka.comment.topic}")
-    private String commentTopic;
 
     @KafkaListener(topics = "${hangout.kafka.comment.topic}", groupId = "${spring.application.name}")
-    public void createComment(NewCommentEvent comment) {
+    public void createComment(CommentEvent comment) {
         if (comment.parentCommentId().isEmpty()) {
             createTopLevelComment(comment);
         } else {
@@ -37,7 +34,7 @@ public class CommentServiceKafkaConsumer {
     }
 
     @Transactional
-    private void createTopLevelComment(NewCommentEvent comment) {
+    private void createTopLevelComment(CommentEvent comment) {
         Post post = postService.getParticularPost(comment.postId());
         if (post != null) {
             Comment topLevelComment = new Comment();
@@ -50,7 +47,7 @@ public class CommentServiceKafkaConsumer {
     }
 
     @Transactional
-    public void createSubComments(NewCommentEvent reply) {
+    public void createSubComments(CommentEvent reply) {
         Optional<Comment> maybeParentComment = commentRepo.findById(reply.parentCommentId().get());
         if (maybeParentComment.isPresent()) {
             Comment parentComment = maybeParentComment.get();
