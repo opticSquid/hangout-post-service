@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/comment")
+@RequestMapping("/v1/comment")
 public class CommentController {
     private final CommentServiceKafkaProducer commentProducerService;
     private final CommentService commentService;

@@ -12,6 +12,7 @@ import com.hangout.core.post_api.entities.HierarchyKeeper;
 import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.repositories.CommentRepo;
 import com.hangout.core.post_api.repositories.HierarchyKeeperRepo;
+import com.hangout.core.post_api.repositories.PostRepo;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,12 @@ import lombok.RequiredArgsConstructor;
 public class CommentServiceKafkaConsumer {
     private final CommentRepo commentRepo;
     private final HierarchyKeeperRepo hkRepo;
+    private final PostRepo postRepo;
     private final PostService postService;
     @Value("${hangout.kafka.comment.topic}")
     private String commentTopic;
 
-    @KafkaListener(topics = "${hangout.kafka.comment.topic}")
+    @KafkaListener(topics = "${hangout.kafka.comment.topic}", groupId = "${spring.application.name}")
     public void createComment(NewCommentEvent comment) {
         if (comment.parentCommentId().isEmpty()) {
             createTopLevelComment(comment);
@@ -42,7 +44,7 @@ public class CommentServiceKafkaConsumer {
             topLevelComment.setTopLevel(true);
             topLevelComment.setPost(post);
             topLevelComment.setText(comment.comment());
-            postService.increaseCommentCount(post.getPostId());
+            postRepo.increaseCommentCount(post.getPostId());
             commentRepo.save(topLevelComment);
         }
     }
@@ -57,7 +59,7 @@ public class CommentServiceKafkaConsumer {
             childComment.setText(reply.comment());
             Post post = postService.getParticularPost(parentComment.getPost().getPostId());
             childComment.setPost(post);
-            postService.increaseCommentCount(post.getPostId());
+            postRepo.increaseCommentCount(post.getPostId());
             childComment = commentRepo.save(childComment);
             HierarchyKeeper hierarchy = new HierarchyKeeper();
             hierarchy.setParentComment(parentComment);
