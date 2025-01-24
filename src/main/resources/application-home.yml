@@ -7,6 +7,11 @@ spring:
     properties:
       hibernate:
         "[format_sql]": true
+      jdbc:
+        "[batch_size]": 30
+      "[order_inserts]": true
+      "[order_deletes]": true
+      "[generate_statistics]": true
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -48,6 +53,16 @@ minio:
   secretKey: G8HC3uphX1TlDDYSxtjTrFSVdRe95XJXV2IhqEYg
 
 hangout:
+  kafka:
+    content:
+      topic: content
+    comment:
+      topic: comments
+    heart:
+      topic: hearts
+      maxPollRecords: 100
+      fetchMinBytes: 1024
+      fetchMaxWaitMs: 10000
   auth-service:
     url: http://localhost:5011
   media:

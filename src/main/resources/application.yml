@@ -21,12 +21,12 @@ spring:
     # database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
     properties:
       hibernate:
-        "[format_sql]": true
+        "[format_sql]": ${FORMAT_SQL}
         jdbc:
-          "[batch_size]": 30
-        "[order_inserts]": true
-        "[order_deletes]": true
-        "[generate_statistics]": true
+          "[batch_size]": ${DB_BATCH_SIZE}
+        "[order_inserts]": ${ORDER_INSERTS}
+        "[order_deletes]": ${ORDER_DELETES}
+        "[generate_statistics]": ${GENERATE_DB_STATISTICS}
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -96,14 +96,14 @@ logging:
 hangout:
   kafka:
     content:
-      topic: content
+      topic: ${CONTENT_TOPIC}
     comment:
-      topic: comments
+      topic: ${COMMENT_TOPIC}
     heart:
-      topic: hearts
-      maxPollRecords: 100
-      fetchMinBytes: 1024
-      fetchMaxWaitMs: 10000
+      topic: ${HEART_TOPIC}
+      maxPollRecords: ${MAX_POLL_RECS}
+      fetchMinBytes: ${MIN_BYTES}
+      fetchMaxWaitMs: ${MAX_WAIT_MS}
   auth-service:
     url: ${AUTH_SERVICE}
   media:
