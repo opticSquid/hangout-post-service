@@ -1,5 +1,7 @@
 package com.hangout.core.post_api.dto;
 
-public record Reply(String parentCommentId, String comment) {
+import java.util.UUID;
+
+public record Reply(UUID postId, UUID parentCommentId, String comment) {
 
 }

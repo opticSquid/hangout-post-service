@@ -1,7 +1,7 @@
 package com.hangout.core.post_api.entities;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,7 +35,7 @@ public class Comment {
     private Boolean topLevel;
     @JsonProperty(access = Access.READ_ONLY)
     @Column(name = "createdat")
-    private final Timestamp createdAt = Timestamp.from(Instant.now());
+    private final ZonedDateTime createdAt = ZonedDateTime.now(ZoneOffset.UTC);
     @JsonProperty(access = Access.READ_ONLY)
     private final Integer replies = 0;
 }

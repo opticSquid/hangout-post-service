@@ -3,29 +3,6 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 
 --Creating the tables
 create table
-    if not exists comment (
-        commentid uuid not null,
-        createdat timestamp(6),
-        replies integer,
-        text varchar(500),
-        toplevel boolean,
-        userid uuid,
-        postid uuid,
-        primary key (commentid)
-    );
-
-create table
-    if not exists hierarchy_keeper (
-        keeperid integer not null,
-        childcommentid uuid,
-        parentcommentid uuid,
-        primary key (keeperid)
-    );
-
--- create sequence if not exists hierarchy_keeper_seq start
--- with
---     1 increment by 50;
-create table
     if not exists media (
         filename varchar(513) not null,
         content_type varchar(255),
@@ -54,6 +31,35 @@ create table
             filename varchar(513),
             primary key (post_id)
     );
+    
+create table
+    if not exists comment (
+        commentid uuid not null,
+        createdat timestamp(6),
+        replies integer,
+        text varchar(500),
+        toplevel boolean,
+        userid uuid,
+        postid uuid,
+        primary key (commentid)
+    );
+
+create table
+    if not exists hierarchy_keeper (
+        keeperid integer not null,
+        childcommentid uuid,
+        parentcommentid uuid,
+        primary key (keeperid)
+    );
+
+create table 
+    if not exists heart (
+        heart_id numeric(38,0) not null,
+        user_id numeric(38,0),
+        post_id uuid,
+        primary key (heart_id)
+    );
+
 
 -- Adding a QuadTree GiST index on the geometry colum for faster search
 CREATE INDEX CONCURRENTLY IF NOT EXISTS locationIndex ON post USING GIST (location);

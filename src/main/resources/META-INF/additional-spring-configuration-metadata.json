@@ -26,7 +26,7 @@
             "description": "Log Directory where ogs will be permanently stored"
         },
         {
-            "name": "hangout.kafka.topic",
+            "name": "hangout.kafka.content.topic",
             "type": "java.lang.String",
             "description": "The kafka topic to produce event in, to indicate new multimedia content is available for processing"
         },
@@ -49,6 +49,31 @@
             "name": "hangout.page-length",
             "type": "java.lang.Integer",
             "description": "Total number of items to be contained in a page for paginated responses"
+        },
+        {
+            "name": "hangout.kafka.comment.topic",
+            "type": "java.lang.String",
+            "description": "The kafka topic to produce event in, to indicate new comment has been added on a given post"
+        },
+        {
+            "name": "hangout.kafka.heart.topic",
+            "type": "java.lang.String",
+            "description": "The kafka topic to produce event in, to indicate new heart has been given to a post or taken form a post by a user"
+        },
+        {
+            "name": "hangout.kafka.heart.maxPollRecords",
+            "type": "java.lang.Integer",
+            "description": "Indicates the number of records to fetch in one go per consumer"
+        },
+        {
+            "name": "hangout.kafka.heart.fetchMinBytes",
+            "type": "java.lang.Integer",
+            "description": "Indicates the min number of bytes to fetch per consumer at minimum"
+        },
+        {
+            "name": "hangout.kafka.heart.fetchMaxWaitMs",
+            "type": "java.lang.Integer",
+            "description": "Indicates the wait time for each consumer for more data to buffer"
         }
     ]
 }

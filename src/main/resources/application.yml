@@ -21,7 +21,12 @@ spring:
     # database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
     properties:
       hibernate:
-        "[format_sql]": true
+        "[format_sql]": ${FORMAT_SQL}
+        jdbc:
+          "[batch_size]": ${DB_BATCH_SIZE}
+        "[order_inserts]": ${ORDER_INSERTS}
+        "[order_deletes]": ${ORDER_DELETES}
+        "[generate_statistics]": ${GENERATE_DB_STATISTICS}
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -33,6 +38,15 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: com.hangout.core.post_api.dto.event
+      auto-offset-reset: earliest
 
 # All traces should be sent to latency analysis tool
 management:
@@ -81,7 +95,15 @@ logging:
 
 hangout:
   kafka:
-    topic: content
+    content:
+      topic: ${CONTENT_TOPIC}
+    comment:
+      topic: ${COMMENT_TOPIC}
+    heart:
+      topic: ${HEART_TOPIC}
+      maxPollRecords: ${MAX_POLL_RECS}
+      fetchMinBytes: ${MIN_BYTES}
+      fetchMaxWaitMs: ${MAX_WAIT_MS}
   auth-service:
     url: ${AUTH_SERVICE}
   media:

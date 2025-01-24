@@ -14,16 +14,26 @@ import com.hangout.core.post_api.entities.Media;
 import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.projections.UploadedMedias;
 
+import jakarta.transaction.Transactional;
+
 public interface PostRepo extends JpaRepository<Post, UUID> {
         @Modifying
+        @Transactional
         @Query(value = "UPDATE post SET comments = comments+1, interactions = interactions+1 where post_id = :postid", nativeQuery = true)
         void increaseCommentCount(@Param("postid") UUID posUuid);
 
         @Modifying
+        @Transactional
         @Query(value = "UPDATE post SET hearts = hearts+1, interactions = interactions+1 where post_id = :postid", nativeQuery = true)
         void increaseHeartCount(@Param("postid") UUID posUuid);
 
         @Modifying
+        @Transactional
+        @Query(value = "UPDATE post SET hearts = CASE WHEN hearts > 0  THEN hearts - 1 ELSE 0 END, interactions = interactions + 1 where post_id = :postid", nativeQuery = true)
+        void decreaseHeartCount(@Param("postid") UUID posUuid);
+
+        @Modifying
+        @Transactional
         @Query(value = "UPDATE post SET interactions = interactions+1 where post_id = :postid", nativeQuery = true)
         void increaseInteractionCount(@Param("postid") UUID posUuid);
 

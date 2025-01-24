@@ -52,7 +52,7 @@ public class PostService {
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     @Value("${hangout.auth-service.url}")
     private String authServiceURL;
-    @Value("${hangout.kafka.topic}")
+    @Value("${hangout.kafka.content.topic}")
     private String topic;
     @Value("${hangout.page-length}")
     private Integer pageLength;
@@ -130,18 +130,13 @@ public class PostService {
         return postsList;
     }
 
-    public Post getParticularPost(String postId) {
-        Optional<Post> maybepost = postRepo.findById(UUID.fromString(postId));
+    public Post getParticularPost(UUID postId) {
+        Optional<Post> maybepost = postRepo.findById(postId);
         if (maybepost.isPresent()) {
-            postRepo.increaseInteractionCount(UUID.fromString(postId));
             return maybepost.get();
         } else {
             return null;
         }
-    }
-
-    public void increaseCommentCount(UUID postId) {
-        postRepo.increaseCommentCount(postId);
     }
 
     public void increaseHeartCount(UUID postId) {
