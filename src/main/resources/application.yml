@@ -22,6 +22,11 @@ spring:
     properties:
       hibernate:
         "[format_sql]": true
+        jdbc:
+          "[batch_size]": 30
+        "[order_inserts]": true
+        "[order_deletes]": true
+        "[generate_statistics]": true
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -41,6 +46,7 @@ spring:
           json:
             trusted:
               packages: com.hangout.core.post_api.dto.event
+      auto-offset-reset: earliest
 
 # All traces should be sent to latency analysis tool
 management:
@@ -95,6 +101,9 @@ hangout:
       topic: comments
     heart:
       topic: hearts
+      maxPollRecords: 100
+      fetchMinBytes: 1024
+      fetchMaxWaitMs: 10000
   auth-service:
     url: ${AUTH_SERVICE}
   media:
