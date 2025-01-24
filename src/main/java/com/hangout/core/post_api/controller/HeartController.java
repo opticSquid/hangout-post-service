@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hangout.core.post_api.dto.DefaultResponse;
+import com.hangout.core.post_api.dto.HasHearted;
 import com.hangout.core.post_api.dto.NewHeartRequest;
+import com.hangout.core.post_api.services.HeartService;
 import com.hangout.core.post_api.services.HeartServiceKafkaProducer;
 
 import lombok.RequiredArgsConstructor;
@@ -21,23 +23,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/v1/heart")
 public class HeartController {
-    private HeartServiceKafkaProducer heartKafkaProducer;
+    private final HeartServiceKafkaProducer heartKafkaProducer;
+    private final HeartService heartService;
 
-    @PostMapping("/")
+    @PostMapping()
     public DefaultResponse addHeart(@RequestHeader(name = "Authorization") String authToken,
             @RequestBody NewHeartRequest heartRequest) {
         return heartKafkaProducer.addHeart(authToken, heartRequest);
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping()
     public DefaultResponse removeHeart(@RequestHeader(name = "Authorization") String authToken,
             @RequestBody NewHeartRequest heartRequest) {
         return heartKafkaProducer.removeHeart(authToken, heartRequest);
     }
 
     @GetMapping("/{postId}")
-    public String hasHearted(@RequestHeader(name = "Authorization") String authToken, @PathVariable UUID postId) {
-        return new String();
+    public HasHearted hasHearted(@RequestHeader(name = "Authorization") String authToken, @PathVariable UUID postId) {
+        return heartService.hasHearted(authToken, postId);
     }
 
 }

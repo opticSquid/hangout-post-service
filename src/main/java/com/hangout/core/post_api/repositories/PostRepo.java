@@ -29,6 +29,11 @@ public interface PostRepo extends JpaRepository<Post, UUID> {
 
         @Modifying
         @Transactional
+        @Query(value = "UPDATE post SET hearts = CASE WHEN hearts > 0  THEN hearts - 1 ELSE 0 END, interactions = interactions + 1 where post_id = :postid", nativeQuery = true)
+        void decreaseHeartCount(@Param("postid") UUID posUuid);
+
+        @Modifying
+        @Transactional
         @Query(value = "UPDATE post SET interactions = interactions+1 where post_id = :postid", nativeQuery = true)
         void increaseInteractionCount(@Param("postid") UUID posUuid);
 

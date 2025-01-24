@@ -56,7 +56,7 @@ create table
     if not exists heart (
         heart_id numeric(38,0) not null,
         user_id numeric(38,0),
-        post_post_id uuid,
+        post_id uuid,
         primary key (heart_id)
     );
 
