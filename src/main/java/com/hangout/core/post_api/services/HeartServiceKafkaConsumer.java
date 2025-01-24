@@ -39,9 +39,9 @@ public class HeartServiceKafkaConsumer {
     }
 
     @Transactional
-    private void addHeart(List<HeartEvent> heartEvent) {
+    private void addHeart(List<HeartEvent> heartEvents) {
         List<Heart> heartList = new ArrayList<>();
-        heartEvent.stream().forEach(h -> {
+        heartEvents.stream().forEach(h -> {
             Post post = postService.getParticularPost(h.postId());
             if (post != null) {
                 Heart heart = new Heart(post, h.userId());
@@ -56,8 +56,8 @@ public class HeartServiceKafkaConsumer {
     }
 
     @Transactional
-    private void removeHeart(List<HeartEvent> heartEvent) {
-        heartEvent.forEach(h -> {
+    private void removeHeart(List<HeartEvent> heartEvents) {
+        heartEvents.forEach(h -> {
             Post post = postService.getParticularPost(h.postId());
             if (post != null) {
                 postRepo.decreaseHeartCount(post.getPostId());
