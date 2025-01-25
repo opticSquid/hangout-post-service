@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.locationtech.jts.geom.Point;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -31,6 +32,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID postId;
     private BigInteger ownerId;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "filename")
     private Media media;

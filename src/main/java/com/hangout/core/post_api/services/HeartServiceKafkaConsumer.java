@@ -2,6 +2,7 @@ package com.hangout.core.post_api.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class HeartServiceKafkaConsumer {
     private final HeartRepo heartRepo;
     private final PostRepo postRepo;
-    private final PostService postService;
 
     @KafkaListener(topics = "${hangout.kafka.heart.topic}", groupId = "${spring.application.name}", containerFactory = "batchEventContainerFactory")
     public void consumeHeartEvent(List<HeartEvent> heartEvent) {
@@ -42,13 +42,13 @@ public class HeartServiceKafkaConsumer {
     private void addHeart(List<HeartEvent> heartEvents) {
         List<Heart> heartList = new ArrayList<>();
         heartEvents.stream().forEach(h -> {
-            Post post = postService.getParticularPost(h.postId());
-            if (post != null) {
-                Heart heart = new Heart(post, h.userId());
+            Optional<Post> post = postRepo.findById(h.postId());
+            if (post.isPresent()) {
+                Heart heart = new Heart(post.get(), h.userId());
                 // TODO: rather than calling this each time we can create a map<Post, like>
                 // which can be used to count which post got how many likes and the like counter
                 // for that post can be increased in one go
-                postRepo.increaseHeartCount(post.getPostId());
+                postRepo.increaseHeartCount(post.get().getPostId());
                 heartList.add(heart);
             }
         });
@@ -58,10 +58,10 @@ public class HeartServiceKafkaConsumer {
     @Transactional
     private void removeHeart(List<HeartEvent> heartEvents) {
         heartEvents.forEach(h -> {
-            Post post = postService.getParticularPost(h.postId());
-            if (post != null) {
-                postRepo.decreaseHeartCount(post.getPostId());
-                heartRepo.removeHeart(post.getPostId(), h.userId());
+            Optional<Post> post = postRepo.findById(h.postId());
+            if (post.isPresent()) {
+                postRepo.decreaseHeartCount(post.get().getPostId());
+                heartRepo.removeHeart(post.get().getPostId(), h.userId());
             }
         });
     }

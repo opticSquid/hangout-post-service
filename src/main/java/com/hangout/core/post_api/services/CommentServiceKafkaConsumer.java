@@ -22,7 +22,6 @@ public class CommentServiceKafkaConsumer {
     private final CommentRepo commentRepo;
     private final HierarchyKeeperRepo hkRepo;
     private final PostRepo postRepo;
-    private final PostService postService;
 
     @KafkaListener(topics = "${hangout.kafka.comment.topic}", groupId = "${spring.application.name}")
     public void createComment(CommentEvent comment) {
@@ -35,10 +34,10 @@ public class CommentServiceKafkaConsumer {
 
     @Transactional
     private void createTopLevelComment(CommentEvent comment) {
-        Post post = postService.getParticularPost(comment.postId());
-        if (post != null) {
-            Comment topLevelComment = new Comment(post, comment.userId(), comment.comment(), true);
-            postRepo.increaseCommentCount(post.getPostId());
+        Optional<Post> post = postRepo.findById(comment.postId());
+        if (post.isPresent()) {
+            Comment topLevelComment = new Comment(post.get(), comment.userId(), comment.comment(), true);
+            postRepo.increaseCommentCount(post.get().getPostId());
             commentRepo.save(topLevelComment);
         }
     }
@@ -48,9 +47,9 @@ public class CommentServiceKafkaConsumer {
         Optional<Comment> maybeParentComment = commentRepo.findById(reply.parentCommentId().get());
         if (maybeParentComment.isPresent()) {
             Comment parentComment = maybeParentComment.get();
-            Post post = postService.getParticularPost(parentComment.getPost().getPostId());
-            Comment childComment = new Comment(post, reply.userId(), reply.comment(), false);
-            postRepo.increaseCommentCount(post.getPostId());
+            Optional<Post> post = postRepo.findById(parentComment.getPost().getPostId());
+            Comment childComment = new Comment(post.get(), reply.userId(), reply.comment(), false);
+            postRepo.increaseCommentCount(post.get().getPostId());
             childComment = commentRepo.save(childComment);
             HierarchyKeeper hierarchy = new HierarchyKeeper();
             hierarchy.setParentComment(parentComment);
