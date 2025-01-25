@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hangout.core.post_api.dto.FileUploadEvent;
 import com.hangout.core.post_api.dto.GetNearbyPostsProjection;
+import com.hangout.core.post_api.dto.GetParticularPostProjection;
 import com.hangout.core.post_api.dto.GetPostsDTO;
 import com.hangout.core.post_api.dto.PostCreationResponse;
 import com.hangout.core.post_api.dto.PostsList;
@@ -130,8 +131,8 @@ public class PostService {
         return postsList;
     }
 
-    public Post getParticularPost(UUID postId) {
-        Optional<Post> maybepost = postRepo.findById(postId);
+    public GetParticularPostProjection getParticularPost(UUID postId) {
+        Optional<GetParticularPostProjection> maybepost = postRepo.getParticularPost(postId);
         if (maybepost.isPresent()) {
             return maybepost.get();
         } else {

@@ -1,6 +1,7 @@
 package com.hangout.core.post_api.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.locationtech.jts.geom.Point;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.hangout.core.post_api.dto.GetNearbyPostsProjection;
+import com.hangout.core.post_api.dto.GetParticularPostProjection;
 import com.hangout.core.post_api.entities.Media;
 import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.projections.UploadedMedias;
@@ -61,4 +63,8 @@ public interface PostRepo extends JpaRepository<Post, UUID> {
                         @Param("userLocation") Point userLocation,
                         @Param("minSearchRadius") Double minSearchRadius,
                         @Param("maxSearchRadius") Double maxSearchRadius);
+
+        @Query(value = "SELECT P.POST_ID, P.OWNER_ID, M.FILENAME, M.CONTENT_TYPE, P.POST_DESCRIPTION, P.HEARTS, P.COMMENTS, P.INTERACTIONS, P.CREATED_AT, P.STATE, P.CITY, P.LOCATION FROM POST P JOIN MEDIA M ON P.FILENAME = M.FILENAME WHERE P.POST_ID = :postId", nativeQuery = true)
+        Optional<GetParticularPostProjection> getParticularPost(
+                        @Param("postId") UUID postId);
 }
