@@ -37,10 +37,7 @@ public class CommentServiceKafkaConsumer {
     private void createTopLevelComment(CommentEvent comment) {
         Post post = postService.getParticularPost(comment.postId());
         if (post != null) {
-            Comment topLevelComment = new Comment();
-            topLevelComment.setTopLevel(true);
-            topLevelComment.setPost(post);
-            topLevelComment.setText(comment.comment());
+            Comment topLevelComment = new Comment(post, comment.userId(), comment.comment(), true);
             postRepo.increaseCommentCount(post.getPostId());
             commentRepo.save(topLevelComment);
         }
@@ -51,11 +48,8 @@ public class CommentServiceKafkaConsumer {
         Optional<Comment> maybeParentComment = commentRepo.findById(reply.parentCommentId().get());
         if (maybeParentComment.isPresent()) {
             Comment parentComment = maybeParentComment.get();
-            Comment childComment = new Comment();
-            childComment.setTopLevel(false);
-            childComment.setText(reply.comment());
             Post post = postService.getParticularPost(parentComment.getPost().getPostId());
-            childComment.setPost(post);
+            Comment childComment = new Comment(post, reply.userId(), reply.comment(), false);
             postRepo.increaseCommentCount(post.getPostId());
             childComment = commentRepo.save(childComment);
             HierarchyKeeper hierarchy = new HierarchyKeeper();

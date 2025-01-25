@@ -1,5 +1,6 @@
 package com.hangout.core.post_api.entities;
 
+import java.math.BigInteger;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -15,9 +16,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,7 +31,7 @@ public class Comment {
     private Post post;
     @JsonProperty(access = Access.READ_ONLY)
     @Column(name = "userid")
-    private UUID userId;
+    private BigInteger userId;
     @Column(length = 500)
     private String text;
     @Column(name = "toplevel")
@@ -38,4 +41,12 @@ public class Comment {
     private final ZonedDateTime createdAt = ZonedDateTime.now(ZoneOffset.UTC);
     @JsonProperty(access = Access.READ_ONLY)
     private final Integer replies = 0;
+
+    public Comment(Post post, BigInteger userId, String text, Boolean topLevel) {
+        this.post = post;
+        this.userId = userId;
+        this.text = text;
+        this.topLevel = topLevel;
+    }
+
 }
