@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hangout.core.post_api.dto.GetParticularPostProjection;
 import com.hangout.core.post_api.dto.GetPostsDTO;
 import com.hangout.core.post_api.dto.PostCreationResponse;
 import com.hangout.core.post_api.dto.PostsList;
-import com.hangout.core.post_api.entities.Post;
 import com.hangout.core.post_api.services.PostService;
 
 import io.micrometer.observation.annotation.Observed;
@@ -69,7 +69,7 @@ public class PostController {
 
     @Observed(name = "get-particular-post", contextualName = "controller")
     @GetMapping("/{postId}")
-    public Post getAParticularPost(@PathVariable UUID postId) {
+    public GetParticularPostProjection getAParticularPost(@PathVariable UUID postId) {
         return this.postService.getParticularPost(postId);
     }
 }
