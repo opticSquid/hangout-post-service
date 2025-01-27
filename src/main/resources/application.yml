@@ -110,7 +110,7 @@ hangout:
     upload-bucket: ${UPLOAD_BUCKET}
   otel-collector:
     url: ${OTEL_COLLECTOR}
-  allowed-origns:
+  allowed-origins:
     url: ${CLIENT_ORIGINS}
   page-length: ${PAGE_LENGTH}
   log:
