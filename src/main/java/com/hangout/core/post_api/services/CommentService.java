@@ -26,6 +26,7 @@ import com.hangout.core.post_api.repositories.CommentRepo;
 import com.hangout.core.post_api.repositories.HierarchyKeeperRepo;
 import com.hangout.core.post_api.repositories.PostRepo;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,6 +39,7 @@ public class CommentService {
     @Value("${hangout.auth-service.url}")
     private String authServiceURL;
 
+    @Transactional
     public CommentCreationResponse createTopLevelComment(String authToken, NewCommentRequest comment) {
         Session session = authorizeUser(authToken);
         if (session.userId() != null) {
@@ -55,6 +57,7 @@ public class CommentService {
         }
     }
 
+    @Transactional
     public CommentCreationResponse createSubComments(String authToken, Reply reply) {
         Session session = authorizeUser(authToken);
         if (session.userId() != null) {
@@ -64,6 +67,7 @@ public class CommentService {
                 Optional<Post> post = postRepo.findById(parentComment.getPost().getPostId());
                 Comment childComment = new Comment(post.get(), session.userId(), reply.comment(), false);
                 postRepo.increaseCommentCount(post.get().getPostId());
+                commentRepo.increaseReplyCount(parentComment.getCommentId());
                 childComment = commentRepo.save(childComment);
                 HierarchyKeeper hierarchy = new HierarchyKeeper(parentComment, childComment);
                 hkRepo.save(hierarchy);
@@ -80,18 +84,18 @@ public class CommentService {
         UUID postIdAsUUID = postId;
         List<FetchCommentProjection> model = commentRepo.fetchTopLevelComments(postIdAsUUID);
         return model.stream()
-                .map(comment -> new CommentDTO(comment.getCommentid(),
-                        comment.getCreatedat(),
-                        comment.getText(), comment.getUserid(), comment.getReplies()))
+                .map(comment -> new CommentDTO(comment.getCommentId(),
+                        comment.getCreatedAt(),
+                        comment.getText(), comment.getUserId(), comment.getReplies()))
                 .toList();
     }
 
     public CommentDTO fetchParticularComment(UUID commentId) {
         Optional<FetchCommentProjection> comment = commentRepo.fetchCommentById(commentId);
         if (comment.isPresent()) {
-            return new CommentDTO(comment.get().getCommentid(),
-                    comment.get().getCreatedat(), comment.get().getText(),
-                    comment.get().getUserid(), comment.get().getReplies());
+            return new CommentDTO(comment.get().getCommentId(),
+                    comment.get().getCreatedAt(), comment.get().getText(),
+                    comment.get().getUserId(), comment.get().getReplies());
         } else {
             throw new NoDataFound("No Comment was found with the given id");
         }
@@ -102,9 +106,9 @@ public class CommentService {
         UUID parentCommentIdUUID = parentCommentId;
         List<FetchCommentProjection> model = hkRepo.findAllChildComments(parentCommentIdUUID);
         return model.stream()
-                .map(comment -> new CommentDTO(comment.getCommentid(),
-                        comment.getCreatedat(),
-                        comment.getText(), comment.getUserid(), comment.getReplies()))
+                .map(comment -> new CommentDTO(comment.getCommentId(),
+                        comment.getCreatedAt(),
+                        comment.getText(), comment.getUserId(), comment.getReplies()))
                 .toList();
     }
 
