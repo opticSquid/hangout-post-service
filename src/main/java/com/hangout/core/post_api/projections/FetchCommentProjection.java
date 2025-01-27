@@ -5,12 +5,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 public interface FetchCommentProjection {
-    UUID getCommentid();
+    UUID getCommentId();
 
-    Instant getCreatedat();
+    Instant getCreatedAt();
 
     String getText();
 
-    BigInteger getUserid();
+    BigInteger getUserId();
+
+    BigInteger getReplies();
 
 }
