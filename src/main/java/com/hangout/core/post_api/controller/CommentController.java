@@ -48,9 +48,15 @@ public class CommentController {
         return commentService.fetchTopLevelCommentsForAPost(postId);
     }
 
+    @Observed(name = "get-particular-comment", contextualName = "controller")
+    @GetMapping("/{commentId}")
+    public CommentDTO getParticularComment(@PathVariable UUID commentId) {
+        return commentService.fetchParticularComment(commentId);
+    }
+
     @Observed(name = "get-replies-to-a-comment", contextualName = "controller")
-    @GetMapping("/replies/{parentCommentId}")
-    public List<CommentDTO> getAllChildCommentsOfAParentComment(@PathVariable UUID parentCommentId) {
-        return commentService.fetchAllChildCommentsForAComment(parentCommentId);
+    @GetMapping("/{commentId}/replies")
+    public List<CommentDTO> getAllChildCommentsOfAParentComment(@PathVariable UUID commentId) {
+        return commentService.fetchAllChildCommentsForAComment(commentId);
     }
 }

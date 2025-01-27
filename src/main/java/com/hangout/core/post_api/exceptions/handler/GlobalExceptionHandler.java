@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.hangout.core.post_api.exceptions.FileUploadFailed;
+import com.hangout.core.post_api.exceptions.NoDataFound;
 import com.hangout.core.post_api.exceptions.UnauthorizedAccessException;
 import com.hangout.core.post_api.exceptions.UnsupportedMediaType;
 
@@ -33,4 +34,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return problem;
 	}
 
+	@ExceptionHandler(NoDataFound.class)
+	public ProblemDetail exceptionHandler(NoDataFound ex) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NO_CONTENT, ex.getMessage());
+		problem.setTitle("No Data Found");
+		return problem;
+	}
 }
