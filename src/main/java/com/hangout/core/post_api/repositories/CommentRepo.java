@@ -12,9 +12,9 @@ import com.hangout.core.post_api.entities.Comment;
 import com.hangout.core.post_api.projections.FetchCommentProjection;
 
 public interface CommentRepo extends JpaRepository<Comment, UUID> {
-    @Query(value = "SELECT commentid, createdat, text, userid FROM comment where postid = :postid AND toplevel = true;", nativeQuery = true)
+    @Query(value = "SELECT comment_id, created_at, text, user_id FROM comment where post_id = :postid AND top_level = true;", nativeQuery = true)
     List<FetchCommentProjection> fetchTopLevelComments(@Param("postid") UUID postid);
 
-    @Query(value = "SELECT commentid, createdat, text, userid FROM comment where commentid = :commentId;", nativeQuery = true)
+    @Query(value = "SELECT comment_id, created_at, text, user_id FROM comment where comment_id = :commentId;", nativeQuery = true)
     Optional<FetchCommentProjection> fetchCommentById(@Param("commentId") UUID commentId);
 }

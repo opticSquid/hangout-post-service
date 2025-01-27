@@ -34,22 +34,24 @@ create table
     
 create table
     if not exists comment (
-        commentid uuid not null,
-        createdat timestamp(6),
+        comment_id uuid not null,
+        created_at timestamp(6)
+        with
+            time zone,
         replies integer,
         text varchar(500),
-        toplevel boolean,
-        userid uuid,
-        postid uuid,
-        primary key (commentid)
+        top_level boolean,
+        user_id numeric(38, 0),
+        post_id uuid,
+        primary key (comment_id)
     );
 
 create table
     if not exists hierarchy_keeper (
-        keeperid integer not null,
-        childcommentid uuid,
-        parentcommentid uuid,
-        primary key (keeperid)
+        keeper_id integer not null,
+        child_comment_id uuid,
+        parent_comment_id uuid,
+        primary key (keeper_id)
     );
 
 create table 

@@ -24,20 +24,16 @@ import lombok.NoArgsConstructor;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "commentid")
     private UUID commentId;
     @ManyToOne
-    @JoinColumn(name = "postid", referencedColumnName = "postId")
+    @JoinColumn(name = "post_id", referencedColumnName = "postId")
     private Post post;
     @JsonProperty(access = Access.READ_ONLY)
-    @Column(name = "userid")
     private BigInteger userId;
     @Column(length = 500)
     private String text;
-    @Column(name = "toplevel")
     private Boolean topLevel;
     @JsonProperty(access = Access.READ_ONLY)
-    @Column(name = "createdat")
     private final ZonedDateTime createdAt = ZonedDateTime.now(ZoneOffset.UTC);
     @JsonProperty(access = Access.READ_ONLY)
     private final Integer replies = 0;

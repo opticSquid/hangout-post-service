@@ -15,13 +15,12 @@ import lombok.NoArgsConstructor;
 public class HierarchyKeeper {
     @Id
     @GeneratedValue
-    @Column(name = "keeperid")
     private Integer keeperId;
     @ManyToOne
-    @JoinColumn(name = "parentcommentid")
+    @JoinColumn(name = "parent_comment_id")
     Comment parentComment;
     @ManyToOne
-    @JoinColumn(name = "childcommentid")
+    @JoinColumn(name = "child_comment_id")
     Comment childComment;
 
     public HierarchyKeeper(Comment parentComment, Comment childComment) {

@@ -1,6 +1,5 @@
 package com.hangout.core.post_api.services;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -82,7 +81,7 @@ public class CommentService {
         List<FetchCommentProjection> model = commentRepo.fetchTopLevelComments(postIdAsUUID);
         return model.stream()
                 .map(comment -> new CommentDTO(comment.getCommentid(),
-                        Timestamp.from(comment.getCreatedat()),
+                        comment.getCreatedat(),
                         comment.getText(), comment.getUserid()))
                 .toList();
     }
@@ -91,7 +90,7 @@ public class CommentService {
         Optional<FetchCommentProjection> comment = commentRepo.fetchCommentById(commentId);
         if (comment.isPresent()) {
             return new CommentDTO(comment.get().getCommentid(),
-                    Timestamp.from(comment.get().getCreatedat()), comment.get().getText(),
+                    comment.get().getCreatedat(), comment.get().getText(),
                     comment.get().getUserid());
         } else {
             throw new NoDataFound("No Comment was found with the given id");
@@ -104,7 +103,7 @@ public class CommentService {
         List<FetchCommentProjection> model = hkRepo.findAllChildComments(parentCommentIdUUID);
         return model.stream()
                 .map(comment -> new CommentDTO(comment.getCommentid(),
-                        Timestamp.from(comment.getCreatedat()),
+                        comment.getCreatedat(),
                         comment.getText(), comment.getUserid()))
                 .toList();
     }
