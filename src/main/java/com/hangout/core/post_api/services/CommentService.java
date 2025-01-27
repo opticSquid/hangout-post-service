@@ -82,7 +82,7 @@ public class CommentService {
         return model.stream()
                 .map(comment -> new CommentDTO(comment.getCommentid(),
                         comment.getCreatedat(),
-                        comment.getText(), comment.getUserid()))
+                        comment.getText(), comment.getUserid(), comment.getReplies()))
                 .toList();
     }
 
@@ -91,7 +91,7 @@ public class CommentService {
         if (comment.isPresent()) {
             return new CommentDTO(comment.get().getCommentid(),
                     comment.get().getCreatedat(), comment.get().getText(),
-                    comment.get().getUserid());
+                    comment.get().getUserid(), comment.get().getReplies());
         } else {
             throw new NoDataFound("No Comment was found with the given id");
         }
@@ -104,7 +104,7 @@ public class CommentService {
         return model.stream()
                 .map(comment -> new CommentDTO(comment.getCommentid(),
                         comment.getCreatedat(),
-                        comment.getText(), comment.getUserid()))
+                        comment.getText(), comment.getUserid(), comment.getReplies()))
                 .toList();
     }
 

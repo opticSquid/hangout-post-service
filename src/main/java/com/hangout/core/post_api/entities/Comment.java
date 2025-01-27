@@ -36,13 +36,14 @@ public class Comment {
     @JsonProperty(access = Access.READ_ONLY)
     private final ZonedDateTime createdAt = ZonedDateTime.now(ZoneOffset.UTC);
     @JsonProperty(access = Access.READ_ONLY)
-    private final Integer replies = 0;
+    private Integer replies;
 
     public Comment(Post post, BigInteger userId, String text, Boolean topLevel) {
         this.post = post;
         this.userId = userId;
         this.text = text;
         this.topLevel = topLevel;
+        this.replies = 0;
     }
 
 }

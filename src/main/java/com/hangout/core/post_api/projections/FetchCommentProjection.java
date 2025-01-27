@@ -13,4 +13,6 @@ public interface FetchCommentProjection {
 
     BigInteger getUserid();
 
+    BigInteger getReplies();
+
 }
