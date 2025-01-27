@@ -51,11 +51,6 @@
             "description": "Total number of items to be contained in a page for paginated responses"
         },
         {
-            "name": "hangout.kafka.comment.topic",
-            "type": "java.lang.String",
-            "description": "The kafka topic to produce event in, to indicate new comment has been added on a given post"
-        },
-        {
             "name": "hangout.kafka.heart.topic",
             "type": "java.lang.String",
             "description": "The kafka topic to produce event in, to indicate new heart has been given to a post or taken form a post by a user"

@@ -6,10 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Data
+@NoArgsConstructor
+@Getter
 public class HierarchyKeeper {
     @Id
     @GeneratedValue
@@ -20,5 +22,11 @@ public class HierarchyKeeper {
     Comment parentComment;
     @ManyToOne
     @JoinColumn(name = "childcommentid")
-    Comment childCommnet;
+    Comment childComment;
+
+    public HierarchyKeeper(Comment parentComment, Comment childComment) {
+        this.parentComment = parentComment;
+        this.childComment = childComment;
+    }
+
 }

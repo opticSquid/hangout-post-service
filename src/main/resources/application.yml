@@ -97,8 +97,6 @@ hangout:
   kafka:
     content:
       topic: ${CONTENT_TOPIC}
-    comment:
-      topic: ${COMMENT_TOPIC}
     heart:
       topic: ${HEART_TOPIC}
       maxPollRecords: ${MAX_POLL_RECS}

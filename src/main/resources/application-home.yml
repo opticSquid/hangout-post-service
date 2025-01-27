@@ -56,8 +56,6 @@ hangout:
   kafka:
     content:
       topic: content
-    comment:
-      topic: comments
     heart:
       topic: hearts
       maxPollRecords: 100
